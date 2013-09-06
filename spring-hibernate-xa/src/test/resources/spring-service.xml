@@ -16,24 +16,13 @@
         http://www.springframework.org/schema/util
         http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
-	<!-- <bean id="setMyAtomikosSystemProps"
-		class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-		<property name="targetObject">
-			<bean
-				class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-				<property name="targetClass" value="java.lang.System" />
-				<property name="targetMethod" value="getProperties" />
-			</bean>
-		</property>
-		<property name="targetMethod" value="putAll" />
-		<property name="arguments">
-			<util:properties>
-				<prop key="com.atomikos.icatch.file">classpath:jta.properties</prop>
-				<prop key="com.atomikos.icatch.hide_init_file_path">true</prop>
-			</util:properties>
-		</property>
-	</bean>
- -->
+	<!-- <bean id="setMyAtomikosSystemProps" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"> 
+		<property name="targetObject"> <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean"> 
+		<property name="targetClass" value="java.lang.System" /> <property name="targetMethod" 
+		value="getProperties" /> </bean> </property> <property name="targetMethod" 
+		value="putAll" /> <property name="arguments"> <util:properties> <prop key="com.atomikos.icatch.file">classpath:jta.properties</prop> 
+		<prop key="com.atomikos.icatch.hide_init_file_path">true</prop> </util:properties> 
+		</property> </bean> -->
 	<bean id="dataSource1" class="com.atomikos.jdbc.AtomikosDataSourceBean"
 		init-method="init" destroy-method="close">
 		<property name="uniqueResourceName">
@@ -102,6 +91,7 @@
 				hibernate.current_session_context_class = jta
 				hibernate.transaction.factory_class=com.atomikos.icatch.jta.hibernate3.AtomikosJTATransactionFactory
 				hibernate.transaction.manager_lookup_class=com.atomikos.icatch.jta.hibernate3.TransactionManagerLookup
+				hibernate.format_sql=true
 
 			</value>
 		</property>
@@ -114,6 +104,8 @@
 		<property name="annotatedClasses">
 			<list>
 				<value>com.github.wowcinder.examples.entity.Test1</value>
+				<value>com.github.wowcinder.examples.entity.DynamicUpdateEntity
+				</value>
 			</list>
 		</property>
 
@@ -141,17 +133,41 @@
 				hibernate.current_session_context_class = jta
 				hibernate.transaction.factory_class=com.atomikos.icatch.jta.hibernate3.AtomikosJTATransactionFactory
 				hibernate.transaction.manager_lookup_class=com.atomikos.icatch.jta.hibernate3.TransactionManagerLookup
+				hibernate.format_sql=true
 			</value>
 		</property>
 		<property name="eventListeners">
 			<map>
-				<entry key="pre-insert" value-ref="entityHasTimeStampListener">
+				<entry key="pre-insert">
+					<list>
+						<ref bean="entityHasTimeStampListener" />
+						<ref bean="passwordPersistencePreInsertListener" />
+					</list>
+				</entry>
+				
+				<entry key="pre-update">
+					<list>
+						<ref bean="passwordPersistencePreUpdateListener" />
+					</list>
+				</entry>
+				
+				<entry key="post-insert">
+					<list>
+						<ref bean="passwordPersistencePostInsertOrUpdate" />
+					</list>
+				</entry>
+				
+				<entry key="post-update">
+					<list>
+						<ref bean="passwordPersistencePostInsertOrUpdate" />
+					</list>
 				</entry>
 			</map>
 		</property>
 		<property name="annotatedClasses">
 			<list>
 				<value>com.github.wowcinder.examples.entity.Test2</value>
+				<value>com.github.wowcinder.examples.entity.User</value>
 			</list>
 		</property>
 

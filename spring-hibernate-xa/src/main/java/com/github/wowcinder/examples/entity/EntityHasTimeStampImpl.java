@@ -3,6 +3,7 @@
  */
 package com.github.wowcinder.examples.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -15,10 +16,11 @@ import org.hibernate.annotations.AccessType;
 
 /**
  * @author XuehuiHe
- * @date 2013å¹„1¤7„1¤7„1¤7
+ * @date 2013å¹„1ï¿½7ï¿½1ï¿½7ï¿½1ï¿½7
  */
 @MappedSuperclass
-public class EntityHasTimeStampImpl implements EntityHasTimeStamp {
+public class EntityHasTimeStampImpl implements EntityHasTimeStamp, Serializable {
+	private static final long serialVersionUID = -6406519212581206490L;
 	private Date createTime;
 	private Date lastUpdateTimeStamp;
 
